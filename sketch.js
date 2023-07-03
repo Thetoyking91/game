@@ -1,6 +1,7 @@
 let saveButton
 let character
 let thatoneguy
+let bg
 let gameInfo
 let socket
 let otherPlayers = []
@@ -19,7 +20,7 @@ function create_UUID(){
 
 function setup() {
     socket = io()
-    createCanvas(1080, 720)
+    createCanvas(1820, 720)
     // saveButton = createButton("Save")
     // saveButton.mousePressed(save)
     let cookies = document.cookie.split("; ")
@@ -38,6 +39,7 @@ function setup() {
         document.cookie = "uuid=" + uuid
         
     }
+    bg = loadImage("./assets/moon.jpg")
     character = loadImage("./assets/character.png")
     thatoneguy = loadImage("./assets/thatoneguy.png")
     textAlign(CENTER)
@@ -72,7 +74,7 @@ function setup() {
 }
 
 function draw() {
-    background(0, 0, 255)
+    background(bg)
     // console.log(deltaTime/1000)
     image(character, gameInfo.x - character.width/16, gameInfo.y - character.height/16, character.width/8, character.height/8)
     for (player in otherPlayers) {
