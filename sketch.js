@@ -5,8 +5,10 @@ let bg
 let gameInfo
 let socket
 let otherPlayers = []
-let speed = 200
+let speed = 250
 let uuid
+let levels = []
+let currentlevel = 0
 
 function create_UUID(){
     var dt = new Date().getTime();
@@ -19,6 +21,13 @@ function create_UUID(){
 }
 
 function setup() {
+    levels[0] = {
+        wall1: new Portal(200, 300, 500, 300, createVector(1, 0)),
+        wall2: new Portal(500, 300, 500, 500, createVector(0, 1))
+    }
+
+    levels[0].wall1.link(levels[0].wall2)
+
     socket = io()
     createCanvas(1820, 720)
     // saveButton = createButton("Save")
@@ -51,11 +60,11 @@ function setup() {
        console.log(gameInfo)
     })
     socket.on('multiplayerPos', (data) => {
-        console.log(otherPlayers.toString())
-        console.log(typeof(otherPlayers))
-        console.log(data)
+        // console.log(otherPlayers.toString())
+        // console.log(typeof(otherPlayers))
+        // console.log(data)
         const i = otherPlayers.findIndex(e => e.id === data.id)
-        console.log(i)
+        // console.log(i)
         if (i > -1){
             otherPlayers[i] = data
         } else {
@@ -67,20 +76,30 @@ function setup() {
         const firstHalf = otherPlayers.splice(0, i)
         const secondHalf = otherPlayers.splice(i)
         otherPlayers = firstHalf.concat(secondHalf)
-        console.log(typeof(otherPlayers))
+        // console.log(typeof(otherPlayers))
     })
    gameInfo = {x: width/2, y: height/2, id: uuid}
-
+    collideDebug(true)
 }
 
 function draw() {
     background(bg)
+    pos = createVector(gameInfo.x, gameInfo.y)
     // console.log(deltaTime/1000)
     image(character, gameInfo.x - character.width/16, gameInfo.y - character.height/16, character.width/8, character.height/8)
     for (player in otherPlayers) {
         image(thatoneguy, otherPlayers[player].x - thatoneguy.width/16, otherPlayers[player].y - thatoneguy.height/16, thatoneguy.width/8, thatoneguy.height/8)
         // console.log(otherPlayers)
         // console.log(player)
+    }
+    for (wall in levels[currentlevel]) {
+        wall = levels[currentlevel][wall]
+        // console.log(levels[currentlevel][wall])
+        wall.show()
+        // console.log(wall.collide(createVector(gameInfo.x, gameInfo.y), character.width/8))
+        if (wall.linked === true) {
+            gameInfo = wall.teleport(pos, character.width/8, gameInfo)
+        }
     }
     // console.log(thatoneguy.height)
     // console.log(thatoneguy.width)
@@ -118,9 +137,9 @@ function draw() {
 }
 
 function keyPressed(keyCode) {
-    console.log(keyCode.key)
+    // console.log(keyCode.key)
     if (keyCode.key == "S") {
-        console.log("Saving?")
+        // console.log("Saving?")
     }
 
     
